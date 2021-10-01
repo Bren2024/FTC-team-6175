@@ -65,10 +65,9 @@ public class DriveTwoController extends LinearOpMode {
         double middleWheelPower;
         double elevatorPower;
         double armServoPower;
-        double leftTriggerPower = 1;
+        double powerMultiplier = 1;
         boolean control = false;
         boolean rightBumper;
-        boolean y = true;
 
         telemetry.addData("Status", "Ready To Start!");
         telemetry.update();
@@ -85,71 +84,46 @@ public class DriveTwoController extends LinearOpMode {
 
             leftPower     = gamepad1.left_stick_y ;
             rightPower    = gamepad1.left_stick_y ;
-            elevatorPower = gamepad2.left_stick_y ;
-            armServoPower = -gamepad2.left_stick_x ;
-            middlePower   = gamepad1.left_stick_x ;
-            leftPower     = -gamepad1.right_stick_x + leftPower ;
-            rightPower    = gamepad1.right_stick_x + rightPower ;
+            // elevatorPower = gamepad2.left_stick_y ;
+            // armServoPower = -gamepad2.left_stick_x ;
+            // middlePower   = gamepad1.left_stick_x ;
+            // leftPower     = -gamepad1.right_stick_x + leftPower ;
+            // rightPower    = gamepad1.right_stick_x + rightPower ;
             rightTrigger  = gamepad1.right_trigger ;
-            leftTrigger   = gamepad1.left_trigger ;
+            // leftTrigger   = gamepad1.left_trigger ;
             
             rightBumper   = gamepad1.right_bumper ;
-            
-            if (gamepad1.right_trigger > 0.1) {
-                grabServo.setPower(-1);
-            } else if (gamepad2.right_trigger > 0.3) {
-                grabServo.setPower(-1);
-            } else {
-                grabServo.setPower(1);
-            }
-            
-            if (gamepad1.dpad_up) {
-                elevator.setPower(-1);
-            } else if (gamepad1.dpad_down) {
-                elevator.setPower(1);
-            } else {
-                elevator.setPower(elevatorPower);
-            } 
-            if (gamepad1.dpad_right) {
-                armServo.setPower(-1);
-            } else if (gamepad1.dpad_left) {
-                armServo.setPower(1);
-            } else {
-                armServo.setPower(armServoPower);
-            }
-            
-            if (gamepad1.x) {
-                buildingServo1.setPosition(0);
-                buildingServo2.setPosition(1);
-            } else if (gamepad1.b) {
-                buildingServo1.setPosition(1);
-                buildingServo2.setPosition(0);
-            } else if (gamepad2.x) {
-                buildingServo1.setPosition(0);
-                buildingServo2.setPosition(1);
-            } else if (gamepad2.b) {
-                buildingServo1.setPosition(1);
-                buildingServo2.setPosition(0);
-            }
-            
+                        
+            // if (gamepad1.dpad_up) {
+            //     elevator.setPower(-1);
+            // } else if (gamepad1.dpad_down) {
+            //     elevator.setPower(1);
+            // } else {
+            //     elevator.setPower(elevatorPower);
+            // } 
+            // if (gamepad1.dpad_right) {
+            //     armServo.setPower(-1);
+            // } else if (gamepad1.dpad_left) {
+            //     armServo.setPower(1);
+            // } else {
+            //     armServo.setPower(armServoPower);
+            // }            
 
-            leftTriggerPower = leftTrigger + 1;
+            powerMultiplier = (rightTrigger + 1)/2;
             
-            leftWheelPower = leftPower/leftTriggerPower;
-            rightWheelPower = rightPower/leftTriggerPower; 
-            middleWheelPower = middlePower/leftTriggerPower;
+            leftWheelPower = leftPower * powerMultiplier;
+            rightWheelPower = rightPower * powerMultiplier; 
+            // middleWheelPower = middlePower * powerMultiplier;
             
             // Send calculated power to wheels
             leftDrive.setPower(leftWheelPower);
             rightDrive.setPower(rightWheelPower);
-            middleDrive.setPower(middleWheelPower);
+            // middleDrive.setPower(middleWheelPower);
 
-            y = false; 
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Motors", "Left: (%.2f), Right (%.2f), Middle (%.2f)", leftWheelPower, rightWheelPower, middleWheelPower);
-            telemetry.addData("Servos", "Arm Servo: NaN");
             // telemetry.addData("Color", "Clear: (%.2f)", colorSensor.red());
             // telemetry.addData("Colors", "Color: (%.2f)", colorSensor1);
             telemetry.update();

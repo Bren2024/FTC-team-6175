@@ -55,14 +55,10 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public class HardwarePushbot
 {
     /* Public OpMode members. */
-    public DcMotor  leftDrive   = null;
-    public DcMotor  rightDrive  = null;
-    // public DcMotor  middleDrive = null;
-    // public DcMotor  elevator    = null;
-    // public Servo    grabServo   = null;
-    // public CRServo  armServo    = null;
-    // public Servo    buildingServo1 = null;
-    // public Servo    buildingServo2 = null;
+    public DcMotor frontLeftDrive = null;
+    public DcMotor frontRightDrive = null;
+    public DcMotor backLeftDrive = null;
+    public DcMotor backRightDrive = null;
 
     // public static final double MID_SERVO       =  0.5 ;
     // public static final double ARM_UP_POWER    =  0.45 ;
@@ -83,34 +79,27 @@ public class HardwarePushbot
         hwMap = ahwMap;
 
         // Define and Initialize Motors
-        leftDrive   = hwMap.get(DcMotor.class, "left_drive");
-        rightDrive  = hwMap.get(DcMotor.class, "right_drive");
-        // middleDrive = hwMap.get(DcMotor.class, "middle_drive");
-        // elevator    = hwMap.get(DcMotor.class, "elevator");
-        // armServo    = hwMap.get(CRServo.class, "arm_servo");
-        // grabServo   = hwMap.get(Servo.class, "grab_servo");
-        // buildingServo1 = hwMap.get(Servo.class, "building_servo1");
-        // buildingServo2 = hwMap.get(Servo.class, "building_servo2");
-        leftDrive.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
-        rightDrive.setDirection(DcMotor.Direction.REVERSE);// Set to FORWARD if using AndyMark motors
+        frontLeftDrive = hwMap.get(DcMotor.class, "front_left");
+        frontRightDrive = hwMap.get(DcMotor.class, "front_right");
+        backLeftDrive = hwMap.get(DcMotor.class, "back_left");
+        backRightDrive = hwMap.get(DcMotor.class, "back_right");
+        frontLeftDrive.setDirection(DcMotor.Direction.FORWARD);
+        frontRightDrive.setDirection(DcMotor.Direction.REVERSE);
+        backLeftDrive.setDirection(DcMotor.Direction.FORWARD);
+        backRightDrive.setDirection(DcMotor.Direction.REVERSE);
 
         // Set all motors to zero power
-        leftDrive.setPower(0);
-        rightDrive.setPower(0);
-        // middleDrive.setPower(0);
-        // elevator.setPower(0);
-        // armServo.setPower(0);
-        // grabServo.setPosition(1);
+        frontLeftDrive.setPower(0);
+        frontRightDrive.setPower(0);
+        backLeftDrive.setPower(0);
+        backRightDrive.setPower(0);
         
-        
-        //leftArm.setPower(0);
-
         // Set all motors to run without encoders.
         // May want to use RUN_USING_ENCODERS if encoders are installed.
-        leftDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        rightDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        // middleDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        // elevator.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        frontLeftDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        frontRightDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        backLeftDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        backRightDrive.setmode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
  }
 

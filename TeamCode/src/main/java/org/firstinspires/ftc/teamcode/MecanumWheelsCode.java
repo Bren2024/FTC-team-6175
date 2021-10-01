@@ -51,15 +51,11 @@ import com.qualcomm.robotcore.util.Range;
  */
 
 @TeleOp(name="Mecanum Wheels", group="Linear Opmode")
-@Disabled
+//@Disabled
 public class MecanumWheelsCode extends LinearOpMode {
 
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
-    private DcMotor leftDrive = null;
-    private DcMotor rightDrive = null;
-    private DcMotor middleDrive = null;
-
 
     @Override
     public void runOpMode() {
@@ -69,17 +65,19 @@ public class MecanumWheelsCode extends LinearOpMode {
         // Initialize the hardware variables. Note that the strings used here as parameters
         // to 'get' must correspond to the names assigned during the robot configuration
         // step (using the FTC Robot Controller app on the phone).
-        leftDrive    = hardwareMap.get(DcMotor.class, "left_drive");
-        rightDrive   = hardwareMap.get(DcMotor.class, "right_drive");
-        middleDrive  = hardwareMap.get(DcMotor.class, "middle_drive");
+        frontLeftDrive = hardwareMap.get(DcMotor.class, "front_left");
+        frontRightDrive = hardwareMap.get(DcMotor.class, "front_right");
+        backLeftDrive = hardwareMap.get(DcMotor.class, "back_left");
+        backRightDrive = hardwareMap.get(DcMotor.class, "back_right");
         
         // colorSensor1 = hardwareMap.ColorSensor.get("colorSensor1");
 
         // Most robots need the motor on one side to be reversed to drive forward
         // Reverse the motor that runs backwards when connected directly to the battery
-        leftDrive.setDirection(DcMotor.Direction.FORWARD);
-        rightDrive.setDirection(DcMotor.Direction.REVERSE);
-        middleDrive.setDirection(DcMotor.Direction.FORWARD);
+        frontLeftDrive.setDirection(DcMotor.Direction.FORWARD);
+        frontRightDrive.setDirection(DcMotor.Direction.REVERSE);
+        backLeftDrive.setDirection(DcMotor.Direction.FORWARD);
+        backRightDrive.setDirection(DcMotor.Direction.REVERSE);
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -89,35 +87,29 @@ public class MecanumWheelsCode extends LinearOpMode {
         while (opModeIsActive()) {
 
             // Setup a variable for each drive wheel to save power level for telemetry
-            double leftPower;
-            double rightPower;
-            double middlePower;
-            int x;
-            x = 1;
+            double frontleftPower;
+            double frontRightPower;
+            double backLeftPower;
+            double backRightPower;
             double rightTrigger;
             double rightTriggerPower;
-            double leftWheelPower;
-            double rightWheelPower;
-            double middleWheelPower;
 
             // Choose to drive using either Tank Mode, or POV Mode
             // Comment out the method that's not used.  The default below is POV.
 
             // POV Mode uses left stick to go forward, and right stick to turn.
             // - This uses basic math to combine motions and is easier to drive straight.
-            // double drive = -gamepad1.left_stick_y;
-            // double turn  =  gamepad1.right_stick_x;
+            double xAxis = gamepad1.left_stick_x;
+            double yAxis = -gamepad1.left_stick_y;
+            double rotation  = gamepad1.right_stick_x;
+            frontleftPower = yAxis + xAxis + rotation;
+            frontRightPower = yAxis - xAxis - rotation;
+            backLeftPower = yAxis - xAxis + rotation;
+            backRightPower = yAxis + xAxis - rotation;
+
             //leftPower    = Range.clip(drive + turn, -1.0, 1.0) ;
             //rightPower   = Range.clip(drive - turn, -1.0, 1.0) ;
 
-            // Tank Mode uses one stick to control each wheel.
-            // - This requires no math, but it is hard to drive forward slowly and keep straight.
-            leftPower   = -gamepad1.left_stick_y ;
-            rightPower  = -gamepad1.left_stick_y ;
-            middlePower = gamepad1.left_stick_x ;
-            leftPower   = gamepad1.right_stick_x + leftPower ;
-            rightPower  = -gamepad1.right_stick_x + rightPower ;
-            
             // if (gamepad1.dpad_left) {
             //     middlePower = -1;
             // } else if (gamepad1.dpad_right) {
@@ -130,18 +122,20 @@ public class MecanumWheelsCode extends LinearOpMode {
             
             rightTriggerPower = rightTrigger + 1;
             
-            leftWheelPower = leftPower/rightTriggerPower;
-            rightWheelPower = rightPower/rightTriggerPower; 
-            middleWheelPower = middlePower/rightTriggerPower;
-            
+            frontleftPower /= rightTriggerPower;
+            frontRightPower /= rightTriggerPower;
+            backLeftPower /= rightTriggerPower;
+            backRightPower /= rightTriggerPower;
+
             // Send calculated power to wheels
-            leftDrive.setPower(leftWheelPower);
-            rightDrive.setPower(rightWheelPower);
-            middleDrive.setPower(middleWheelPower);
+            frontLeftDrive.setPower(frontleftPower);
+            frontRightDrive.setPower(frontRightPower);
+            backLeftDrive.setPower(backLeftPower);
+            backRightDrive.setPower(backRightPower);
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
-            telemetry.addData("Motors", "Left: (%.2f), Right (%.2f), Middle (%.2f)", leftWheelPower, rightWheelPower, middleWheelPower);
+            telemetry.addData("Motors", "Front Left: (%.2f), Front Right (%.2f), Back Left (%.2f), Back Right (%.2f)", frontleftPower, frontRightPower, backLeftPower, backRightPower);
             // telemetry.addData("Color", "Clear: (%.2f)", colorSensor.red());
             // telemetry.addData("Colors", "Color: (%.2f)", colorSensor1);
             telemetry.update();
