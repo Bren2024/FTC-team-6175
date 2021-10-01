@@ -99,13 +99,30 @@ public class MecanumWheelsCode extends LinearOpMode {
 
             // POV Mode uses left stick to go forward, and right stick to turn.
             // - This uses basic math to combine motions and is easier to drive straight.
-            double xAxis = gamepad1.left_stick_x;
-            double yAxis = -gamepad1.left_stick_y;
+            double xAxis = gamepad1.left_stick_x * 1.5; // Counteract imperfect strafing. Up to driver preference.
+            double yAxis = -gamepad1.left_stick_y; 
             double rotation  = gamepad1.right_stick_x;
             frontleftPower = yAxis + xAxis + rotation;
             frontRightPower = yAxis - xAxis - rotation;
             backLeftPower = yAxis - xAxis + rotation;
             backRightPower = yAxis + xAxis - rotation;
+
+
+            if (Math.abs(frontLeftPower) > 1 || Math.abs(backLeftPower) > 1 ||
+            Math.abs(frontRightPower) > 1 || Math.abs(backRightPower) > 1 ) {
+                // Find the largest power
+                double max = 0;
+                max = Math.max(Math.abs(frontLeftPower), Math.abs(backLeftPower));
+                max = Math.max(Math.abs(frontRightPower), max);
+                max = Math.max(Math.abs(backRightPower), max);
+
+                // Divide everything by max (it's positive so we don't need to worry
+                // about signs)
+                frontLeftPower /= max;
+                backLeftPower /= max;
+                frontRightPower /= max;
+                backRightPower /= max;
+            }
 
             //leftPower    = Range.clip(drive + turn, -1.0, 1.0) ;
             //rightPower   = Range.clip(drive - turn, -1.0, 1.0) ;
