@@ -56,6 +56,10 @@ public class MecanumWheelsCode extends LinearOpMode {
 
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
+    private DcMotor frontLeftDrive = null;
+    private DcMotor frontRightDrive = null;
+    private DcMotor backLeftDrive = null;
+    private DcMotor backRightDrive = null; 
 
     @Override
     public void runOpMode() {
@@ -87,7 +91,7 @@ public class MecanumWheelsCode extends LinearOpMode {
         while (opModeIsActive()) {
 
             // Setup a variable for each drive wheel to save power level for telemetry
-            double frontleftPower;
+            double frontLeftPowe;
             double frontRightPower;
             double backLeftPower;
             double backRightPower;
@@ -102,23 +106,23 @@ public class MecanumWheelsCode extends LinearOpMode {
             double xAxis = gamepad1.left_stick_x * 1.5; // Counteract imperfect strafing. Up to driver preference.
             double yAxis = -gamepad1.left_stick_y; 
             double rotation  = gamepad1.right_stick_x;
-            frontleftPower = yAxis + xAxis + rotation;
+            frontLeftPowe = yAxis + xAxis + rotation;
             frontRightPower = yAxis - xAxis - rotation;
             backLeftPower = yAxis - xAxis + rotation;
             backRightPower = yAxis + xAxis - rotation;
 
 
-            if (Math.abs(frontLeftPower) > 1 || Math.abs(backLeftPower) > 1 ||
+            if (Math.abs(frontLeftPowe) > 1 || Math.abs(backLeftPower) > 1 ||
             Math.abs(frontRightPower) > 1 || Math.abs(backRightPower) > 1 ) {
                 // Find the largest power
                 double max = 0;
-                max = Math.max(Math.abs(frontLeftPower), Math.abs(backLeftPower));
+                max = Math.max(Math.abs(frontLeftPowe), Math.abs(backLeftPower));
                 max = Math.max(Math.abs(frontRightPower), max);
                 max = Math.max(Math.abs(backRightPower), max);
 
                 // Divide everything by max (it's positive so we don't need to worry
                 // about signs)
-                frontLeftPower /= max;
+                frontLeftPowe /= max;
                 backLeftPower /= max;
                 frontRightPower /= max;
                 backRightPower /= max;
@@ -139,20 +143,20 @@ public class MecanumWheelsCode extends LinearOpMode {
             
             rightTriggerPower = rightTrigger + 1;
             
-            frontleftPower /= rightTriggerPower;
+            frontLeftPowe /= rightTriggerPower;
             frontRightPower /= rightTriggerPower;
             backLeftPower /= rightTriggerPower;
             backRightPower /= rightTriggerPower;
 
             // Send calculated power to wheels
-            frontLeftDrive.setPower(frontleftPower);
+            frontLeftDrive.setPower(frontLeftPowe);
             frontRightDrive.setPower(frontRightPower);
             backLeftDrive.setPower(backLeftPower);
             backRightDrive.setPower(backRightPower);
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
-            telemetry.addData("Motors", "Front Left: (%.2f), Front Right (%.2f), Back Left (%.2f), Back Right (%.2f)", frontleftPower, frontRightPower, backLeftPower, backRightPower);
+            telemetry.addData("Motors", "Front Left: (%.2f), Front Right (%.2f), Back Left (%.2f), Back Right (%.2f)", frontLeftPowe, frontRightPower, backLeftPower, backRightPower);
             // telemetry.addData("Color", "Clear: (%.2f)", colorSensor.red());
             // telemetry.addData("Colors", "Color: (%.2f)", colorSensor1);
             telemetry.update();
