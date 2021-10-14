@@ -54,7 +54,8 @@ import com.qualcomm.robotcore.util.Range;
 //@Disabled
 public class MecanumWheelsCode extends LinearOpMode {
 
-    // Declare OpMode members.
+    // Declare hardware variables
+    HardwarePushbot robot = new HardwarePushbot();   // Use a Pushbot's hardware
     private ElapsedTime runtime = new ElapsedTime();
     private DcMotor frontLeftDrive = null;
     private DcMotor frontRightDrive = null;
@@ -66,22 +67,7 @@ public class MecanumWheelsCode extends LinearOpMode {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
-        // Initialize the hardware variables. Note that the strings used here as parameters
-        // to 'get' must correspond to the names assigned during the robot configuration
-        // step (using the FTC Robot Controller app on the phone).
-        frontLeftDrive = hardwareMap.get(DcMotor.class, "front_left");
-        frontRightDrive = hardwareMap.get(DcMotor.class, "front_right");
-        backLeftDrive = hardwareMap.get(DcMotor.class, "back_left");
-        backRightDrive = hardwareMap.get(DcMotor.class, "back_right");
-        
-        // colorSensor1 = hardwareMap.ColorSensor.get("colorSensor1");
-
-        // Most robots need the motor on one side to be reversed to drive forward
-        // Reverse the motor that runs backwards when connected directly to the battery
-        frontLeftDrive.setDirection(DcMotor.Direction.FORWARD);
-        frontRightDrive.setDirection(DcMotor.Direction.REVERSE);
-        backLeftDrive.setDirection(DcMotor.Direction.FORWARD);
-        backRightDrive.setDirection(DcMotor.Direction.REVERSE);
+        robot.init(hardwareMap);
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -98,11 +84,8 @@ public class MecanumWheelsCode extends LinearOpMode {
             double rightTrigger;
             double rightTriggerPower;
 
-            // Choose to drive using either Tank Mode, or POV Mode
-            // Comment out the method that's not used.  The default below is POV.
 
-            // POV Mode uses left stick to go forward, and right stick to turn.
-            // - This uses basic math to combine motions and is easier to drive straight.
+            // Set up the math to run the Mecanum Wheels
             double xAxis = gamepad1.left_stick_x * 1.5; // Counteract imperfect strafing. Up to driver preference.
             double yAxis = -gamepad1.left_stick_y; 
             double rotation  = gamepad1.right_stick_x;
@@ -111,7 +94,7 @@ public class MecanumWheelsCode extends LinearOpMode {
             backLeftPower = yAxis - xAxis + rotation;
             backRightPower = yAxis + xAxis - rotation;
 
-
+            // Adjust motor values so that they are proportional and within the range of -1 and 1. 
             if (Math.abs(frontLeftPowe) > 1 || Math.abs(backLeftPower) > 1 ||
             Math.abs(frontRightPower) > 1 || Math.abs(backRightPower) > 1 ) {
                 // Find the largest power
@@ -139,20 +122,21 @@ public class MecanumWheelsCode extends LinearOpMode {
             //     middlePower = 0;
             // }
             
+            // Init the rightTrigger variable.
             rightTrigger = gamepad1.right_trigger;
             
+            // Slow down the robot if the right trigger is pressed. 
             rightTriggerPower = rightTrigger + 1;
-            
             frontLeftPowe /= rightTriggerPower;
             frontRightPower /= rightTriggerPower;
             backLeftPower /= rightTriggerPower;
             backRightPower /= rightTriggerPower;
 
             // Send calculated power to wheels
-            frontLeftDrive.setPower(frontLeftPowe);
-            frontRightDrive.setPower(frontRightPower);
-            backLeftDrive.setPower(backLeftPower);
-            backRightDrive.setPower(backRightPower);
+            robot.frontLeftDrive.setPower(frontLeftPowe);
+            robot.frontRightDrive.setPower(frontRightPower);
+            robot.backLeftDrive.setPower(backLeftPower);
+            robot.backRightDrive.setPower(backRightPower);
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());

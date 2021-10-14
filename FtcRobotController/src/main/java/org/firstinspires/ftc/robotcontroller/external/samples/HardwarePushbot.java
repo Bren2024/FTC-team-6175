@@ -83,10 +83,12 @@ public class HardwarePushbot
         frontRightDrive = hwMap.get(DcMotor.class, "front_right");
         backLeftDrive = hwMap.get(DcMotor.class, "back_left");
         backRightDrive = hwMap.get(DcMotor.class, "back_right");
-        frontLeftDrive.setDirection(DcMotor.Direction.FORWARD);
-        frontRightDrive.setDirection(DcMotor.Direction.REVERSE);
-        backLeftDrive.setDirection(DcMotor.Direction.FORWARD);
-        backRightDrive.setDirection(DcMotor.Direction.REVERSE);
+
+        // Set motor Direction
+        frontLeftDrive.setDirection(DcMotor.Direction.REVERSE);
+        frontRightDrive.setDirection(DcMotor.Direction.FORWARD);
+        backLeftDrive.setDirection(DcMotor.Direction.REVERSE);
+        backRightDrive.setDirection(DcMotor.Direction.FORWARD);
 
         // Set all motors to zero power
         frontLeftDrive.setPower(0);
@@ -94,7 +96,7 @@ public class HardwarePushbot
         backLeftDrive.setPower(0);
         backRightDrive.setPower(0);
         
-        // Set all motors to run without encoders.
+        // Set motors to run with/without enocders.
         // May want to use RUN_USING_ENCODERS if encoders are installed.
         frontLeftDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         frontRightDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
