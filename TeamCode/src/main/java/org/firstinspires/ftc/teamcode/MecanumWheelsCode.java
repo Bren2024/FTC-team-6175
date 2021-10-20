@@ -27,28 +27,12 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.robotcontroller.external.samples;
+package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
-
-
-/**
- * This file contains an minimal example of a Linear "OpMode". An OpMode is a 'program' that runs in either
- * the autonomous or the teleop period of an FTC match. The names of OpModes appear on the menu
- * of the FTC Driver Station. When an selection is made from the menu, the corresponding OpMode
- * class is instantiated on the Robot Controller and executed.
- *
- * This particular OpMode just executes a basic Tank Drive Teleop for a two wheeled robot
- * It includes all the skeletal structure that all linear OpModes contain.
- *
- * Use Android Studios to Copy this Class, and Paste it into your team's code folder with a new name.
- * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
- */
 
 @TeleOp(name="Mecanum Wheels", group="Linear Opmode")
 //@Disabled
@@ -57,10 +41,6 @@ public class MecanumWheelsCode extends LinearOpMode {
     // Declare hardware variables
     HardwarePushbot robot = new HardwarePushbot();   // Use a Pushbot's hardware
     private ElapsedTime runtime = new ElapsedTime();
-    private DcMotor frontLeftDrive = null;
-    private DcMotor frontRightDrive = null;
-    private DcMotor backLeftDrive = null;
-    private DcMotor backRightDrive = null; 
 
     @Override
     public void runOpMode() {
@@ -77,7 +57,7 @@ public class MecanumWheelsCode extends LinearOpMode {
         while (opModeIsActive()) {
 
             // Setup a variable for each drive wheel to save power level for telemetry
-            double frontLeftPowe;
+            double frontLeftPower;
             double frontRightPower;
             double backLeftPower;
             double backRightPower;
@@ -89,23 +69,23 @@ public class MecanumWheelsCode extends LinearOpMode {
             double xAxis = gamepad1.left_stick_x * 1.5; // Counteract imperfect strafing. Up to driver preference.
             double yAxis = -gamepad1.left_stick_y; 
             double rotation  = gamepad1.right_stick_x;
-            frontLeftPowe = yAxis + xAxis + rotation;
+            frontLeftPower = yAxis + xAxis + rotation;
             frontRightPower = yAxis - xAxis - rotation;
             backLeftPower = yAxis - xAxis + rotation;
             backRightPower = yAxis + xAxis - rotation;
 
             // Adjust motor values so that they are proportional and within the range of -1 and 1. 
-            if (Math.abs(frontLeftPowe) > 1 || Math.abs(backLeftPower) > 1 ||
+            if (Math.abs(frontLeftPower) > 1 || Math.abs(backLeftPower) > 1 ||
             Math.abs(frontRightPower) > 1 || Math.abs(backRightPower) > 1 ) {
                 // Find the largest power
                 double max = 0;
-                max = Math.max(Math.abs(frontLeftPowe), Math.abs(backLeftPower));
+                max = Math.max(Math.abs(frontLeftPower), Math.abs(backLeftPower));
                 max = Math.max(Math.abs(frontRightPower), max);
                 max = Math.max(Math.abs(backRightPower), max);
 
                 // Divide everything by max (it's positive so we don't need to worry
                 // about signs)
-                frontLeftPowe /= max;
+                frontLeftPower /= max;
                 backLeftPower /= max;
                 frontRightPower /= max;
                 backRightPower /= max;
@@ -127,20 +107,20 @@ public class MecanumWheelsCode extends LinearOpMode {
             
             // Slow down the robot if the right trigger is pressed. 
             rightTriggerPower = rightTrigger + 1;
-            frontLeftPowe /= rightTriggerPower;
+            frontLeftPower /= rightTriggerPower;
             frontRightPower /= rightTriggerPower;
             backLeftPower /= rightTriggerPower;
             backRightPower /= rightTriggerPower;
 
             // Send calculated power to wheels
-            robot.frontLeftDrive.setPower(frontLeftPowe);
+            robot.frontLeftDrive.setPower(frontLeftPower);
             robot.frontRightDrive.setPower(frontRightPower);
             robot.backLeftDrive.setPower(backLeftPower);
             robot.backRightDrive.setPower(backRightPower);
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
-            telemetry.addData("Motors", "Front Left: (%.2f), Front Right (%.2f), Back Left (%.2f), Back Right (%.2f)", frontLeftPowe, frontRightPower, backLeftPower, backRightPower);
+            telemetry.addData("Motors", "Front Left: (%.2f), Front Right (%.2f), Back Left (%.2f), Back Right (%.2f)", frontLeftPower, frontRightPower, backLeftPower, backRightPower);
             // telemetry.addData("Color", "Clear: (%.2f)", colorSensor.red());
             // telemetry.addData("Colors", "Color: (%.2f)", colorSensor1);
             telemetry.update();

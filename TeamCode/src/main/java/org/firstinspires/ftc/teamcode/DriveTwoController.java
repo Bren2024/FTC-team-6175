@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.robotcontroller.external.samples;
+package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -123,7 +123,7 @@ public class DriveTwoController extends LinearOpMode {
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
-            telemetry.addData("Motors", "Left: (%.2f), Right (%.2f), Middle (%.2f)", leftWheelPower, rightWheelPower, middleWheelPower);
+            telemetry.addData("Motors", "Left: (%.2f), Right (%.2f)", leftWheelPower, rightWheelPower);
             // telemetry.addData("Color", "Clear: (%.2f)", colorSensor.red());
             // telemetry.addData("Colors", "Color: (%.2f)", colorSensor1);
             telemetry.update();
