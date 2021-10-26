@@ -56,14 +56,12 @@ public class MecanumWheelsCode extends LinearOpMode {
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
 
-            // Setup a variable for each drive wheel to save power level for telemetry
             double frontLeftPower;
             double frontRightPower;
             double backLeftPower;
             double backRightPower;
             double rightTrigger;
             double rightTriggerPower;
-
 
             // Set up the math to run the Mecanum Wheels
             double xAxis = gamepad1.left_stick_x * 1.5; // Counteract imperfect strafing. Up to driver preference.
