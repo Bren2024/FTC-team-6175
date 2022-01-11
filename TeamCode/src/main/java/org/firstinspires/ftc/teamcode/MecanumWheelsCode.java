@@ -29,10 +29,20 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import java.lang.Math;
+import java.util.*;
+
+import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 @TeleOp(name="Mecanum Wheels", group="Linear Opmode")
 //@Disabled
@@ -42,12 +52,42 @@ public class MecanumWheelsCode extends LinearOpMode {
     HardwarePushbot robot = new HardwarePushbot();   // Use a Pushbot's hardware
     private ElapsedTime runtime = new ElapsedTime();
 
+    static double xAxis;
+    static double yAxis;
+
+    // The IMU sensor object
+    BNO055IMU imu;
+
+    // State used for updating telemetry
+    Orientation angles;
+
     @Override
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
         robot.init(hardwareMap);
+
+        // Set up the parameters with which we will use our IMU. Note that integration
+        // algorithm here just reports accelerations to the logcat log; it doesn't actually
+        // provide positional information.
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
+        parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
+        parameters.loggingEnabled      = true;
+        parameters.loggingTag          = "IMU";
+        parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
+
+        Dictionary<String,Boolean> prevControllerInput = new Hashtable<>();
+
+        boolean driveOrientation = false;
+
+        // Retrieve and initialize the IMU. We expect the IMU to be attached to an I2C port
+        // on a Core Device Interface Module, configured to be a sensor of type "AdaFruit IMU",
+        // and named "imu".
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
+        imu.initialize(parameters);
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -56,23 +96,47 @@ public class MecanumWheelsCode extends LinearOpMode {
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
 
+            angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+            prevControllerInput.put("A Button", gamepad1.a);
+            prevControllerInput.put("B Button", gamepad1.b);
+
             double frontLeftPower;
             double frontRightPower;
             double backLeftPower;
             double backRightPower;
             double rightTrigger;
             double rightTriggerPower;
+            double collectionPower;
+            double carouselPower;
+            double armPower;
+            double liftServoPower;
+            double leftStickX;
+            double leftStickY;
+            double robotRotation;
+
+            // Simplification of: If the a button has been pressed since the last loop, then change the driveOrientation variable.
+            driveOrientation = ((prevControllerInput.get("A Button") != gamepad1.a) && gamepad1.a) != driveOrientation;
 
             // Set up the math to run the Mecanum Wheels
-            double xAxis = gamepad1.left_stick_x * 1.5; // Counteract imperfect strafing. Up to driver preference.
-            double yAxis = -gamepad1.left_stick_y; 
+            leftStickX = gamepad1.left_stick_x;
+            leftStickY = gamepad1.left_stick_y;
+            if (driveOrientation) {
+                robotRotation = angles.firstAngle * Math.PI / 180;
+                xAxis = (leftStickX * Math.cos(robotRotation)) - (leftStickY * Math.sin(robotRotation)) * 1.5; // Counteract imperfect strafing. Up to driver preference.
+                yAxis = (leftStickX * Math.sin(robotRotation)) + (leftStickY * Math.cos(robotRotation));
+            } else {
+                xAxis = gamepad1.left_stick_x * 1.5; // Counteract imperfect strafing. Up to driver preference.
+                yAxis = -gamepad1.left_stick_y;
+            }
+
             double rotation  = gamepad1.right_stick_x;
+
             frontLeftPower = yAxis + xAxis + rotation;
             frontRightPower = yAxis - xAxis - rotation;
             backLeftPower = yAxis - xAxis + rotation;
             backRightPower = yAxis + xAxis - rotation;
 
-            // Adjust motor values so that they are proportional and within the range of -1 and 1. 
+            // Adjust motor values so that they are proportional and within the range of -1 and 1.
             if (Math.abs(frontLeftPower) > 1 || Math.abs(backLeftPower) > 1 ||
             Math.abs(frontRightPower) > 1 || Math.abs(backRightPower) > 1 ) {
                 // Find the largest power
@@ -89,39 +153,52 @@ public class MecanumWheelsCode extends LinearOpMode {
                 backRightPower /= max;
             }
 
-            //leftPower    = Range.clip(drive + turn, -1.0, 1.0) ;
-            //rightPower   = Range.clip(drive - turn, -1.0, 1.0) ;
+            // If (first button) is pressed, set power to 1. If (second button) is pressed, set power to -1.
+            // Else, set power to 0.
+            collectionPower = gamepad2.dpad_right ? 1 : gamepad2.dpad_left ? -1 : 0;
+            armPower = gamepad2.dpad_up ? 1 : gamepad2.dpad_down ? -1 : 0;
+            carouselPower = gamepad2.a ? 1.5 : gamepad2.y ? -1.5 : 0;
+            if gamepad2.a
 
-            // if (gamepad1.dpad_left) {
-            //     middlePower = -1;
-            // } else if (gamepad1.dpad_right) {
-            //     middlePower = 1;
-            // } else {
-            //     middlePower = 0;
-            // }
-            
             // Init the rightTrigger variable.
             rightTrigger = gamepad1.right_trigger;
-            
-            // Slow down the robot if the right trigger is pressed. 
+
+            // Slow down the robot if the right trigger is pressed.
             rightTriggerPower = rightTrigger + 1;
             frontLeftPower /= rightTriggerPower;
             frontRightPower /= rightTriggerPower;
             backLeftPower /= rightTriggerPower;
             backRightPower /= rightTriggerPower;
 
+            prevControllerInput.put("A Button", gamepad1.a);
+
             // Send calculated power to wheels
             robot.frontLeftDrive.setPower(frontLeftPower);
             robot.frontRightDrive.setPower(frontRightPower);
             robot.backLeftDrive.setPower(backLeftPower);
             robot.backRightDrive.setPower(backRightPower);
+            robot.carouselMotor.setPower(carouselPower);
+            robot.arm.setPower(armPower);
+            robot.liftServo.setPower();
+
+            robot.leftCollection.setPower(collectionPower);
+            robot.rightCollection.setPower(collectionPower);
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Motors", "Front Left: (%.2f), Front Right (%.2f), Back Left (%.2f), Back Right (%.2f)", frontLeftPower, frontRightPower, backLeftPower, backRightPower);
-            // telemetry.addData("Color", "Clear: (%.2f)", colorSensor.red());
-            // telemetry.addData("Colors", "Color: (%.2f)", colorSensor1);
+            telemetry.addData("Motors", "Collection: (%.2f)", collectionPower);
+            telemetry.addData("Position", "Heading: (%.2f)", angles.firstAngle);
+
             telemetry.update();
         }
+    }
+
+    String formatAngle(AngleUnit angleUnit, double angle) {
+        return formatDegrees(AngleUnit.DEGREES.fromUnit(angleUnit, angle));
+    }
+
+    String formatDegrees(double degrees){
+        return String.format(Locale.getDefault(), "%.1f", AngleUnit.DEGREES.normalize(degrees));
     }
 }

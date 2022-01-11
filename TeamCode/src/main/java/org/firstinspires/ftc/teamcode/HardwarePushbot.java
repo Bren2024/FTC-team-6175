@@ -29,12 +29,20 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.ColorSensor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.robotcore.external.navigation.Position;
+import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 
 /**
  * This is NOT an opmode.
@@ -59,6 +67,11 @@ public class HardwarePushbot
     public DcMotor frontRightDrive = null;
     public DcMotor backLeftDrive = null;
     public DcMotor backRightDrive = null;
+    public DcMotor leftCollection = null;
+    public DcMotor rightCollection = null;
+    public DcMotor carouselMotor = null;
+    public DcMotor arm = null;
+    public CRServo liftServo = null;
 
     // public static final double MID_SERVO       =  0.5 ;
     // public static final double ARM_UP_POWER    =  0.45 ;
@@ -83,25 +96,43 @@ public class HardwarePushbot
         frontRightDrive = hwMap.get(DcMotor.class, "front_right");
         backLeftDrive = hwMap.get(DcMotor.class, "back_left");
         backRightDrive = hwMap.get(DcMotor.class, "back_right");
+        leftCollection = hwMap.get(DcMotor.class, "left_collection");
+        rightCollection = hwMap.get(DcMotor.class, "right_collection");
+        carouselMotor = hwMap.get(DcMotor.class, "carousel_motor");
+        arm = hwMap.get(DcMotor.class, "arm");
+        liftServo = hwMap.get(CRServo.class, "lift_servo");
 
         // Set motor Direction
         frontLeftDrive.setDirection(DcMotor.Direction.REVERSE);
         frontRightDrive.setDirection(DcMotor.Direction.FORWARD);
         backLeftDrive.setDirection(DcMotor.Direction.REVERSE);
         backRightDrive.setDirection(DcMotor.Direction.FORWARD);
+        leftCollection.setDirection(DcMotor.Direction.REVERSE);
+        rightCollection.setDirection(DcMotor.Direction.FORWARD);
+        carouselMotor.setDirection(DcMotor.Direction.FORWARD);
+        arm.setDirection(DcMotor.Direction.FORWARD);
+
 
         // Set all motors to zero power
         frontLeftDrive.setPower(0);
         frontRightDrive.setPower(0);
         backLeftDrive.setPower(0);
         backRightDrive.setPower(0);
+        leftCollection.setPower(0);
+        rightCollection.setPower(0);
+        carouselMotor.setPower(0);
+        arm.setPower(0);
         
         // Set motors to run with/without enocders.
         // May want to use RUN_USING_ENCODERS if encoders are installed.
-        frontLeftDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        frontRightDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        backLeftDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        backRightDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        frontLeftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        frontRightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        backLeftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        backRightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftCollection.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightCollection.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        carouselMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        arm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
  }
 
